@@ -1,0 +1,94 @@
+__config h'3f31'<br>
+include <P16F877A.INC><br>
+list p=16F877A<br>
+sayac equ 0x20<br>
+deger equ 0x21<br>
+isikhizi equ 0x22<br>
+goto anaprogram<br>
+org 0x04<br>
+kesme<br><br>
+		banksel PIR1<br>
+		btfss PIR1,TMR1IF<br>
+		retfie<br>
+		MOVLW h'3C'<br>
+		MOVWF TMR1H<br>
+		MOVLW h'B0'<br>
+		MOVWF TMR1L<br>
+		bcf PIR1,TMR1IF<br>
+		incf sayac<br>
+		movf sayac,w<br>
+		subwf isikhizi,w<br>
+		btfss STATUS,Z<br>
+		retfie<br>
+		incf deger<br>
+		clrf sayac<br>
+		retfie<br>
+<br>
+anaprogram<br><br>
+		BANKSEL T1CON<br>
+		bsf T1CON,TMR1ON<br>
+		bcf T1CON,4<br>
+		bcf T1CON,5<br>
+	    bcf T1CON,TMR1CS<br>
+		bcf T1CON,T1SYNC<br>
+		BANKSEL INTCON<br>
+		bsf INTCON,6<br>
+		bsf INTCON,7<br>
+		banksel PIE1<br>
+		bsf PIE1,0<br>
+		BANKSEL TRISB<br>
+		clrf TRISB<br>
+		movlw 0x06<br>
+		movwf ADCON1<br>
+		movlw d'255'<br>
+		movwf TRISA<br>
+		BANKSEL PORTB<br>
+		CLRF PORTB<br>
+		clrf deger<br>
+		clrf sayac<br>
+		movlw d'20'<br>
+		movwf isikhizi<br>
+		BANKSEL TMR1L<br>
+		MOVLW h'3C'<br>
+		MOVWF TMR1H<br>
+		MOVLW h'B0'<br>
+		MOVWF TMR1L<br>
+yak<br><br>
+		movf deger,W<br>
+		movwf PORTB<br>
+		btfsc PORTA,1<br>
+		goto hizlandir<br>
+		BTFSC PORTA,0<br>
+		goto yavaslat<br>
+		goto yak<br>
+<br>
+yavaslat<br><br>
+		movf isikhizi,w<br>
+		sublw d'30'<br>
+		btfsc STATUS,Z<br>
+		goto yak<br>
+		incf isikhizi
+		incf isikhizi
+		goto sonsuz
+
+hizlandir
+		btfsc isikhizi,4
+    	goto a
+		btfss isikhizi,3
+		goto a
+		btfsc isikhizi,2
+		goto a
+		btfss isikhizi,1
+		goto a
+		goto yak
+a
+		decf isikhizi
+		decf isikhizi
+		goto sonsuz
+sonsuz
+		BTFSC PORTA,0
+		GOTO sonsuz
+		BTFSC PORTA,1
+		goto sonsuz
+		goto yak
+END

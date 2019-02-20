@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+    .btnler{
+        margin-left: 30%;
+    }
+    .yazilar{
+        margin-left: 15%;
+        margin-top: 15px;
+        background-color: aqua;
+        height: auto;
+        width: 700px;
+
+    }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div class="btnler">
+            <input type="button" style="width:252px" onclick="deney1();"   value="Carpma İşlemi"><br>
+            <input type="button" style="width:252px" onclick="deney2();"   value="Timer"><br>
+            <input type="button" style="width:252px" onclick="deney3();"   value="Lookabtable"><br>
+            <input type="button" style="width:252px" onclick="deney4();"   value="ADC"><br>
+            <input type="button" style="width:252px" onclick="deney5();"   value="PWM"><br>
+
+    </div>
+    <div class="yazilar">
+        <p id="kodlar">ckdıvf</p>
+            
+        </p>
+    </div>
+</body>
+</html>
+<script>
+ function deney1(){
+     document.getElementById('kodlar').innerHTML="<h3>iki 8 bitlik sayının çarpımı</h3><br>__config H'3f31' <br>INCLUDE <P16F877A.INC><br>sayi1 equ 0x21<br>sayi2 equ 0x22<br>sayi_l equ 0x23<br>sayi_h equ 0x24<br><br>org 0x04<br>anaprogram<br>bsf STATUS,RP0<br>movlw 0x06<br>movwf ADCON1<br>movlw d'255'<br>movwf TRISA<br>movlw d'0'<br>movwf TRISB<br>movwf TRISC<br>bcf STATUS,RP0<br>movlw d'3'<br>movwf sayi1<br>movlw d'173'<br>movwf sayi2<br>clrf PORTB<br>bsf PORTC,0<br>clrf sayi_h<br>clrf sayi_l<br>bcf STATUS,C<br>clrw<br><br>dongu<br>btfsc STATUS,C<br>goto ayarla<br>addwf sayi1,w<br>decfsz sayi2,f<br>goto dongu<br>goto yak<br>ayarla<br>incf sayi_h<br>bcf STATUS,C<br>goto dongu<br>yak<br>btfsc STATUS,C<br>incf sayi_h<br>movwf sayi_l<br>movwf PORTB<br>bcf STATUS,C<br>clrf sayi1<br>goto kontrol<br>kontrol<br>btfss PORTA,0<br>goto kontrol<br>goto secim_l<br>secim_l<br>btfss sayi1,0<br>goto secim_h<br>bsf PORTC,0<br>movf sayi_l,w<br>movwf PORTB<br>comf sayi1,f<br>goto sonsuz<br>secim_h<br>bcf PORTC,0<br>movf sayi_h,w<br>movwf PORTB<br>comf sayi1,f<br>goto sonsuz<br>sonsuz<br>btfss PORTA,0<br>goto kontrol<br>goto sonsuz	<br>END";
+     }
+     function deney2(){
+     document.getElementById('kodlar').innerHTML="<h3>Timer 1 kullanarak ışık Hızını artırıp azaltma</h3><br>__config h'3f31'<br>include <P16F877A.INC><br>list p=16F877A<br>sayac equ 0x20<br>deger equ 0x21<br>isikhizi equ 0x22<br>goto anaprogram<br>org 0x04<br>kesme<br><br>		banksel PIR1<br>		btfss PIR1,TMR1IF<br>		retfie<br>		MOVLW h'3C'<br>		MOVWF TMR1H<br>		MOVLW h'B0'<br>		MOVWF TMR1L<br>		bcf PIR1,TMR1IF<br>		incf sayac<br>		movf sayac,w<br>		subwf isikhizi,w<br		btfss STATUS,Z<br>		retfie<br>		incf deger<br>		clrf sayac<br>		retfie<br><br>anaprogram<br><br>		BANKSEL T1CON<br>		bsf T1CON,TMR1ON<br>		bcf T1CON,4<br>		bcf T1CON,5<br>	    bcf T1CON,TMR1CS<br>		bcf T1CON,T1SYNC<br>		BANKSEL INTCON<br>		bsf INTCON,6<br>		bsf INTCON,7<br>		banksel PIE1<br>		bsf PIE1,0<br>		BANKSEL TRISB<br>		clrf TRISB<br>		movlw 0x06<br>	movwf ADCON1<br>	movlw d'255'<br>		movwf TRISA<br>		BANKSEL PORTB<br>		CLRF PORTB<br>clrf deger<br>		clrf sayac<br>		movlw d'20'<br>		movwf isikhizi<br>		BANKSEL TMR1L<br>		MOVLW h'3C'<br>		MOVWF TMR1H<br>		MOVLW h'B0'<br>MOVWF TMR1L<br>yak<br><br>		movf deger,W<br>		movwf PORTB<br>		btfsc PORTA,1<br>		goto hizlandir<br>		BTFSC PORTA,0<br>		goto yavaslat<br>goto yak<br><br>yavaslat<br><br>movf isikhizi,w<br>		sublw d'30'<br>		btfsc STATUS,Z<br>		goto yak<br>		incf isikhizi<br>		incf isikhizi<br>	goto sonsuz<br>hizlandir<br><br>btfsc isikhizi,4<br>goto a<br>btfss isikhizi,3<br>goto a<br>btfsc isikhizi,2<br>goto a<br>btfss isikhizi,1<br>goto a<br>goto yak<br>a<br><br>	decf isikhizi<br>decf isikhizi<br>goto sonsuz<br>sonsuz<br><br>BTFSC PORTA,0<br>GOTO sonsuz<br>BTFSC PORTA,1<br>goto sonsuz<br>goto yak<br>END<br>";
+     }
+    
+     function deney3(){
+     document.getElementById('kodlar').innerHTML="<h3>Lookabtable İle Sayıcı</h3><br>__config h'3f31'<br>INCLUDE <P16F877A.INC><br>sayac equ 0x20<br>deger1 equ 0x21<br>deger2 equ 0x25<br>a equ 0x26<br><br><br>goto anaprogram<br>org 0x04<br>kesme<br><br>		BTFSS INTCON,TMR0IF<br>				movlw d'5'<br>		BANKSEL INTCON<br>				incf sayac<br>		subwf sayac,w<br>		btfss STATUS,Z<br>		retfie<br>		call ayarla<br>		retfie<br>org 0x50<br>anaprogram<br>		BSF STATUS,RP0<br>		BSF STATUS,RP1;bank 3 e gec<br>		BSF INTCON,GIE<br>		BSF INTCON,TMR0IE  ;tmr0 aktifet<br>	MOVLW b'00000100'<br>	MOVWF OPTION_REG  ;presckler 32 ayarla<br>		BANKSEL TRISA  <br>		CLRF TRISB<br>	clrf TRISA  <br>		BCF STATUS,RP0<br>		movlw d'5'<br>		movwf TMR0<br>yak<br>		call sonsuz<br>		movlw d'2'<br>		movwf PORTA<br><br>		movf deger1,w<br>		call looktable<br>		movwf PORTB<br>				movlw d'1'<br>		movwf PORTA<br>				call looktable<br>		goto yak<br>sonsuz<br><br>		movlw d'250'<br>				decfsz a<br>		goto $-1<br>		return<br>ayarla<br><br>		clrf sayac<br>		incf deger1<br>	incf deger1<br>		movf deger1,w<br>		sublw d'10'<br>				return<br>		incf deger2<br>		movf deger2,w<br>		sublw d'4'<br>		btfss STATUS,Z<br>		return<br>		clrf deger2<br>		return		<br>looktable<br><br>		addwf PCL,f<br>		retlw b'0111111'<br>	retlw b'0000110'<br>		retlw b'1011011'<br>		retlw b'1001111'<br>		retlw b'1100110';4<br>		retlw b'1101101';5<br>		retlw b'1111101';6<br>		retlw b'0000111'<br>		retlw b'1111111'<br>		retlw b'1101111'<br>END";
+     }
+     function deney4(){
+     document.getElementById('kodlar').innerHTML="<h3>ADC</h3><br>__config h'3f31'<br>#INCLUDE <P16F877A.INC><br>goto anaprogram<br>ORG 0X04<br>kesme<br><br>		MOVF ADRESH,W<br>		MOVWF PORTB	<br>				MOVF ADRESL,W<br>		BANKSEL PORTC<br>		MOVWF PORTC<br>		BSF ADCON0,GO<br>		retfie<br>anaprogram<br>		BANKSEL TRISB<br>		CLRF TRISB<br>		clrf TRISC<br>		MOVLW d'255'<br>		MOVWF TRISA<br>		BANKSEL ADCON1<br>		MOVLW B'00000000'<br>		MOVWF ADCON1<br>		BANKSEL ADCON0	<br>		MOVLW B'00000001'	<br>			MOVWF ADCON0<br>		BANKSEL PIE1<br>		bsf PIE1,ADIE<br>		BANKSEL INTCON<br>		BSF INTCON,GIE<br>		BSF INTCON,PEIE	<br>		BANKSEL ADCON0<br>		BSF ADCON0,GO<br>oyala<br>goto oyala<br>			END";
+     }
+     function deney5(){
+     document.getElementById('kodlar').innerHTML="<h3>PWM</h3><br>__config h'3f31'<br>__config h'3f31'<BR>INCLUDE <P16F877A.INC><br>anaprogram<br>	BANKSEL PR2<br>	MOVLW D'249'<br>	MOVWF PR2<br>	BANKSEL CCP1CON<br>	MOVLW D'12'<br>	MOVWF CCP1CON<br>	MOVWF CCP2CON<br>	MOVLW D'125'<br>	MOVWF CCPR2L<br>	MOVWF CCPR1L<br>	BANKSEL TRISC<br>	clrf TRISC<br>	movlw d'255'<br>	movwf TRISA<br>	movlw 0x06<br>	movwf ADCON1<br>	BSF INTCON,GIE<br>	BSF INTCON,PEIE<br>	BANKSEL T2CON<br>	MOVLW D'5'<br>	MOVWF T2CON<br><br><br>	don<br><br>	BTFSC PORTA,0<br>	GOTO motor_artir<br>	btfsc PORTA,1<br>	GOTO motor_azalt<br>	BTFSC PORTA,2<br>	GOTO led_artir<br>	btfsc PORTA,3<br>	GOTO led_azalt<br>	GOTO don<br>	motor_artir<br>	MOVF CCPR2L,W<br>	SUBLW D'245'<br>	btfss STATUS,C<br>	goto don<br>	MOVLW D'5'<br>	ADDWF CCPR2L,f<br>	goto sonsuz<br>motor_azalt<br>	movlw d'5'<br>	SUBWF CCPR2L,W<br>	BTFSS STATUS,C<br>	goto don<br> 	MOVlW d'5'<br>	subwf CCPR2L,F<br>	goto sonsuz<br>led_artir<br><br>	MOVlW d'5<br>'	addwf CCPR1L,F<br>	goto sonsuz<br>led_azalt<br><br> 	MOVlW d'5'<br>	subwf CCPR1L,F<br>	goto sonsuz<br>sonsuz<br><br>	btfsc PORTA,0<br>	goto sonsuz<br>	btfsc PORTA,1<br>	goto sonsuz<br>	btfsc PORTA,2<br>	goto sonsuz<br>	btfsc PORTA,3<br>	goto sonsuz<br>	goto don<br>	end";
+     }
+</script>
